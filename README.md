@@ -23,10 +23,6 @@
   <a href="https://github.com/sponsors/eugeniughelbur"><img src="https://img.shields.io/badge/Sponsor-EA4AAA?style=for-the-badge&logo=github-sponsors&logoColor=white" alt="Sponsor" /></a>
 </p>
 
-<p align="center">
-  <a href="https://oosmetrics.com/repo/eugeniughelbur/obsidian-second-brain"><img src="https://img.shields.io/badge/oosmetrics-%F0%9F%8F%86%20Trending%20repo-DAA520?style=for-the-badge&labelColor=2C2C2C" alt="oosmetrics: trending repo" /></a>
-</p>
-
 <h1 align="center">obsidian-second-brain</h1>
 
 <p align="center">
