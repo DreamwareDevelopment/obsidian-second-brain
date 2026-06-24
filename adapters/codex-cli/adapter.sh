@@ -67,8 +67,8 @@ also accepted if the user types it.
 
 ## Scripts
 
-Python helpers live under `.codex/scripts/`. They run via `uv run -m
-scripts.research.<name>` from the vault root (or wherever the skill is
+Python helpers live under `.codex/scripts/`. They run via `uv run python
+scripts/<name>.py` from the vault root (or wherever the skill is
 installed). The commands that need them reference the exact invocation
 inside the command body.
 
@@ -129,8 +129,8 @@ Then in your vault:
 - `AGENTS.md` is the operating manual Codex reads at session start.
 - `.codex/commands/*.md` are the command bodies the AI follows when a
   matching trigger fires.
-- `.codex/scripts/` holds the Python helpers invoked by the research
-  toolkit commands. Run them via `uv run -m scripts.research.<name>`.
+- `.codex/scripts/` holds the Python helpers invoked by some commands.
+  Run them via `uv run python scripts/<name>.py`.
 
 Start Codex CLI from the vault root.
 EOF

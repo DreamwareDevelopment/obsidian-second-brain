@@ -8,11 +8,10 @@ Last reviewed against commit `ff0319c` (2026-06-05).
 
 ## System overview
 
-obsidian-second-brain is a cross-CLI **skill** (not a plugin, not a hosted service) that turns any Obsidian vault into an AI-first second brain. One platform-neutral command source compiles to four AI CLIs - Claude Code, Codex CLI, Gemini CLI, OpenCode - through a build-time adapter pattern. At runtime a slash command reads and writes the user's vault as plain markdown; commands shell out to Python helpers for anything deterministic (vault health, research fetches, codebase scans).
+obsidian-second-brain is a cross-CLI **skill** (not a plugin, not a hosted service) that turns any Obsidian vault into an AI-first second brain. One platform-neutral command source compiles to four AI CLIs - Claude Code, Codex CLI, Gemini CLI, OpenCode - through a build-time adapter pattern. At runtime a slash command reads and writes the user's vault as plain markdown; commands shell out to Python helpers for anything deterministic (vault health, codebase scans).
 
-- **45 commands**, grouped by `category:` frontmatter: vault 18, thinking 13, research 8, meta 6.
-- **40 commands are cross-platform.** The 4 Google Calendar commands (`/obsidian-agenda`, `/obsidian-calendar`, `/obsidian-meeting`, `/obsidian-schedule`) carry `exclude: [codex-cli, gemini-cli, opencode]` and ship Claude Code only, because they depend on the Google Calendar MCP.
-- A research toolkit that is key-less by default (free public sources) and uses Grok + Perplexity + Gemini when keys are present.
+- **38 commands**, grouped by `category:` frontmatter: vault 18, thinking 13, research 1, meta 6.
+- **34 commands are cross-platform.** The 4 Google Calendar commands (`/obsidian-agenda`, `/obsidian-calendar`, `/obsidian-meeting`, `/obsidian-schedule`) carry `exclude: [codex-cli, gemini-cli, opencode]` and ship Claude Code only, because they depend on the Google Calendar MCP.
 - An opt-in background agent plus optional user-scheduled agents.
 - MIT licensed.
 
@@ -38,9 +37,9 @@ The AI-first vault rule ties it all together: every note a command writes is des
 
 | Path | Role |
 |---|---|
-| `commands/` | 45 slash-command definitions, one `.md` each. The platform-neutral source and the product surface. |
+| `commands/` | 38 slash-command definitions, one `.md` each. The platform-neutral source and the product surface. |
 | `references/` | Shared specs the commands link to. `ai-first-rules.md` is the canonical, non-negotiable vault-write spec. |
-| `scripts/` | Python and Shell engine: build orchestrator, vault tooling, research toolkit, codebase scanner. |
+| `scripts/` | Python and Shell engine: build orchestrator, vault tooling, codebase scanner. |
 | `adapters/` | Platform translation layer. `lib.sh` plus one `adapter.sh` per CLI. |
 | `hooks/` | Claude Code hooks: AI-first write validation, session-start context injection, opt-in background agent. |
 | `dist/` | Build output, one tree per platform. Gitignored. Regenerate with `scripts/build.sh`. |
@@ -53,9 +52,9 @@ The AI-first vault rule ties it all together: every note a command writes is des
 
 ```
 obsidian-second-brain/
-|-- commands/            # 45 command .md files (the source)
+|-- commands/            # 38 command .md files (the source)
 |-- references/          # ai-first-rules.md (canonical) + schemas + templates + bases/
-|-- scripts/             # build.sh, lib.sh, vault tooling, research/, architect_scan.py, ...
+|-- scripts/             # build.sh, lib.sh, vault tooling, architect_scan.py, ...
 |-- adapters/            # lib.sh + {claude-code,codex-cli,gemini-cli,opencode}/adapter.sh
 |-- hooks/               # validate-ai-first.sh, load_vault_context.py, obsidian-bg-agent.sh
 |-- dist/                # build output per platform (gitignored)
@@ -71,8 +70,8 @@ obsidian-second-brain/
 ```mermaid
 graph TD
   REF["references/<br/>specs (ai-first-rules.md = canonical)"]
-  CMD["commands/<br/>44 .md, platform-neutral source"]
-  SCR["scripts/<br/>engine + research toolkit + build.sh"]
+  CMD["commands/<br/>38 .md, platform-neutral source"]
+  SCR["scripts/<br/>engine + build.sh"]
   ADP["adapters/<br/>lib.sh + 4 platform adapters"]
   HK["hooks/<br/>validate-ai-first, context loader, bg-agent"]
   DIST["dist/&lt;platform&gt;/<br/>build output (gitignored)"]
@@ -93,20 +92,20 @@ graph TD
 
 Commands are grouped by `category:` frontmatter, not by folder. Counts are at commit `ff0319c`. Commands marked `(Claude Code only)` are excluded from the Codex / Gemini / OpenCode builds.
 
-### Vault (17)
+### Vault (18)
 Vault management: saving, organizing, searching, scheduling, maintaining.
 
-`/obsidian-save` `/obsidian-daily` `/obsidian-log` `/obsidian-task` `/obsidian-person` `/obsidian-capture` `/obsidian-find` `/obsidian-recap` `/obsidian-board` `/obsidian-project` `/obsidian-projects` `/obsidian-recurring` `/obsidian-world` `/obsidian-agenda` (Claude Code only) `/obsidian-calendar` (Claude Code only) `/obsidian-meeting` (Claude Code only) `/obsidian-schedule` (Claude Code only)
+`/obsidian-save` `/obsidian-daily` `/obsidian-log` `/obsidian-task` `/obsidian-person` `/obsidian-capture` `/obsidian-catchup` `/obsidian-find` `/obsidian-recap` `/obsidian-board` `/obsidian-project` `/obsidian-projects` `/obsidian-recurring` `/obsidian-world` `/obsidian-agenda` (Claude Code only) `/obsidian-calendar` (Claude Code only) `/obsidian-meeting` (Claude Code only) `/obsidian-schedule` (Claude Code only)
 
 ### Thinking (13)
 Use vault history to generate insight, challenge assumptions, surface patterns, and record decisions.
 
 `/obsidian-challenge` `/obsidian-emerge` `/obsidian-connect` `/obsidian-graduate` `/obsidian-decide` `/obsidian-adr` `/obsidian-reconcile` `/obsidian-review` `/obsidian-synthesize` `/obsidian-learn` `/obsidian-panel` `/idea-discovery` `/vault-deep-synthesis`
 
-### Research (8)
-AI-powered research and ingestion; findings save to the vault following the AI-first rule.
+### Research (1)
+Ingestion; findings save to the vault following the AI-first rule.
 
-`/research` `/research-deep` `/notebooklm` `/x-read` `/x-pulse` `/youtube` `/podcast` `/obsidian-ingest`
+`/obsidian-ingest`
 
 ### Meta (6)
 Bootstrap, audit, export, visualize, document, and extend the system itself.
@@ -126,21 +125,7 @@ Every command that writes to a vault must follow `references/ai-first-rules.md`.
 - Confidence levels (`stated | high | medium | speculation`) where applicable.
 - Anti-fabrication and search-completeness are hard rules: never invent facts, never claim absence without an exhaustive search, mark unknowns as `TBD`.
 
-`ai-first-rules.md` also holds the per-type frontmatter schemas (daily, project, person, task, decision, devlog, review, research, adr, the thinking-tool types, agenda-snapshot, meeting, recurring-task, architecture-overview, architecture-module).
-
----
-
-## Research toolkit
-
-Lives under `scripts/research/`. One Python entry point per research command plus a `lib/` layer.
-
-- **Keyed mode:** Perplexity Sonar for web research, Grok (xAI Agent Tools API, default grok-4) for X and live search, Gemini File Search for vault-grounded NotebookLM queries.
-- **Free key-less mode:** when no Perplexity key is set, `/research` and `/research-deep` fall back to roughly ten free public sources (Wikipedia, HackerNews, arXiv, Reddit, Lobsters, dev.to, OpenAlex, Semantic Scholar, CrossRef, DuckDuckGo) via `scripts/research/lib/`, and Claude synthesizes the dossier. This removed the project's single biggest adoption barrier - the toolkit no longer hard-errors without a paid key.
-- **Other ingest:** `/youtube` (transcript via `youtube-transcript-api`), `/podcast` (RSS via `feedparser`).
-
-Configuration is read from the environment or `~/.config/obsidian-second-brain/.env`; `OBSIDIAN_VAULT_PATH` is required so notes save to the right vault on any machine.
-
-Python dependencies (`pyproject.toml`, managed via `uv`): `openai`, `requests`, `python-dotenv`, `youtube-transcript-api`, `google-api-python-client`, `google-genai`, `feedparser`.
+`ai-first-rules.md` also holds the per-type frontmatter schemas (daily, project, person, task, decision, devlog, review, adr, the thinking-tool types, agenda-snapshot, meeting, recurring-task, architecture-overview, architecture-module).
 
 ---
 

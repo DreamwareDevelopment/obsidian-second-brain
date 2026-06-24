@@ -26,7 +26,7 @@ Read the answer. Confirm understanding back in one sentence before proceeding.
 
 ## Phase 2 - Naming
 
-From the intent, propose 3 candidate kebab-case names. Names should be lowercase, hyphenated, and start with `obsidian-` (vault-management commands) OR a topic prefix (research toolkit uses `research-*`, social uses `x-*`/`brand-*`) OR just a verb (`create-*`, `import-*`).
+From the intent, propose 3 candidate kebab-case names. Names should be lowercase, hyphenated, and start with `obsidian-` (vault-management commands) OR a topic prefix (e.g. `brand-*` for social) OR just a verb (`create-*`, `import-*`).
 
 Use AskUserQuestion (single-select) with 3 options plus "Other" implicit:
 
@@ -86,18 +86,16 @@ If `yes`: the generated command body MUST end with the AI-first rule footer (see
 
 ---
 
-## Phase 7 - External APIs?
+## Phase 7 - External data?
 
 Ask via AskUserQuestion (multi-select):
 
-> "Does this command call any external APIs?"
-> - Perplexity Sonar (web research)
-> - xAI Grok (X posts, Live Search)
-> - YouTube Data API
+> "Does this command need data from outside the vault?"
+> - An MCP connector (web search, calendar, a SaaS tool, etc.)
 > - Other (free text)
 > - None - purely operates on the vault and conversation
 
-If any are selected, the generated body should include a setup line referencing `~/.config/obsidian-second-brain/.env` and the relevant key (e.g., `PERPLEXITY_API_KEY`).
+If an MCP connector is selected, the generated body should name the connector and the tools it calls, and note that the user must have that connector configured in their client. The skill no longer ships Python API-key scaffolding - prefer MCP connectors for external data.
 
 ---
 

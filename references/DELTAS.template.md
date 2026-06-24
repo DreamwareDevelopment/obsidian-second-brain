@@ -18,7 +18,6 @@ Upstream ships this as `references/DELTAS.template.md` and never edits your `DEL
 - **Vault path:** `<where your vault lives>`
 - **Owner / name:** `<you>`
 - **Preset used:** `<default | executive | builder | creator | researcher>`
-- **Research toolkit:** `<enabled with which keys | deferred | free-only>`
 - **Open questions:** `<anything you have not decided yet>`
 
 ## Bootstrap status

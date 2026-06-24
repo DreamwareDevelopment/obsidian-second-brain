@@ -4,7 +4,7 @@
 
 This page lists known forks that take the vault-rewrite architecture (the AI-first rule, the wikilink graph, the rewrite-vs-append principle from Karpathy's LLM Wiki) and apply it to a specific domain - academic research, legal practice, finance, medicine, anything.
 
-Each fork stays independent. The relationship is contractual, not custodial: upstream owns the core primitives (vault management, AI-first rule, the rewrite engine, the multi-platform adapter layer, the generic research toolkit), and forks own everything domain-specific (source routers, controlled-vocab schemas, domain-specific backends, specialized note types).
+Each fork stays independent. The relationship is contractual, not custodial: upstream owns the core primitives (vault management, AI-first rule, the rewrite engine, the multi-platform adapter layer), and forks own everything domain-specific (source routers, controlled-vocab schemas, domain-specific backends, specialized note types).
 
 ## Why this pattern
 
@@ -14,8 +14,7 @@ Instead, upstream ships the **primitives** that forks plug into:
 
 - Vault management, AI-first rule enforcement, the rewrite engine
 - Multi-platform adapter layer (Claude Code / Codex CLI / Gemini CLI / OpenCode)
-- The generic research toolkit shape (Phase 1 vault scan, Phase 2/3 external research, Phase 4 synthesis)
-- A pluggable **Backend protocol** for Phase 3 (in progress, per [Discussion #38](https://github.com/eugeniughelbur/obsidian-second-brain/discussions/38)) so any domain can add its own research backends without forking the engine
+- The note-synthesis pipeline (Phase 1 vault scan, Phase 4 synthesis) that forks layer their domain logic onto
 
 Forks contribute back the generic primitives that came out of their domain work. Anything that survives the "would a non-domain user benefit from this?" test is PR-eligible.
 

@@ -1,16 +1,10 @@
 [project]
-name = "obsidian-second-brain-research"
+name = "obsidian-second-brain"
 version = "0.10.0"
-description = "Research toolkit for obsidian-second-brain - Grok, Perplexity, Gemini, and YouTube research that saves to your vault"
+description = "Helper scripts for obsidian-second-brain - vault health, export, and maintenance utilities"
 requires-python = ">=3.10"
 dependencies = [
-    "openai>=1.40.0",
-    "requests>=2.32.0",
-    "python-dotenv>=1.0.0",
-    "youtube-transcript-api>=0.6.2",
-    "google-api-python-client>=2.110.0",
-    "google-genai>=2.3.0",
-    "feedparser>=6.0.10",
+    "pyyaml>=6.0",
 ]
 
 [dependency-groups]

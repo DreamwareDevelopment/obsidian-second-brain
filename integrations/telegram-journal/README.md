@@ -20,9 +20,8 @@ the AI-first note rules, so future-Claude can read what you captured.
 - **PDF / document** -> Claude reads the PDF, writes an AI-first literature note (summary,
   key points, why it matters) to `Research/Papers/`, saves + embeds the file, and links it
   from today's note.
-- **Link** (YouTube / X / article) -> dispatched to the matching obsidian-second-brain
-  research command (`/youtube`, `/x-read`, `/research`), which saves its own AI-first note.
-  (Requires `OBSIDIAN_SKILL_REPO` set to your clone of this repo.)
+- **Link** (article / page) -> Claude reads the page, writes an AI-first note capturing
+  the summary and why it matters, and files it to `Research/` linked from today's note.
 
 Two behaviors worth knowing:
 - **Fill-links:** when a capture references a `[[person/company/project]]` that has no note

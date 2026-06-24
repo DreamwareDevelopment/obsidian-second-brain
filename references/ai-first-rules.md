@@ -176,29 +176,6 @@ tags: [review, ...]
 ai-first: true
 ```
 
-### `type: research` / `type: research-deep` / `type: x-read` / `type: x-pulse` / `type: youtube` / `type: podcast`
-See `commands/research*.md`, `commands/x-*.md`, `commands/youtube.md`, and `commands/podcast.md` for the full schemas. All set `ai-first: true` and follow the universal rules.
-
-### `type: podcast`
-```yaml
-date: YYYY-MM-DD
-time: HH:MM
-type: podcast
-show: ""                      # podcast show name
-host: ""                      # show host or author
-episode-title: ""
-episode-url: ""               # link to episode page (publisher-provided)
-feed-url: ""                  # RSS feed URL
-source-url: ""                # the URL the user pasted (Apple, RSS, etc.)
-guid: ""                      # episode GUID from RSS
-published: ""                 # publisher-provided publish date string
-duration: ""                  # publisher-provided duration string
-transcript-source: rss-transcript-tag | whisper-api | show-notes
-tags: [research, podcast, ...]
-cost-usd: 0.0
-ai-first: true
-```
-
 ### `type: adr`
 ```yaml
 date: YYYY-MM-DD
@@ -341,12 +318,6 @@ Dev log for [date] about [project]. Captures work done, problems encountered, de
 [Weekly / Monthly] review covering [period-start] through [period-end]. The review summarizes shipped work, decisions made, people met, and patterns that emerged. Use this as a baseline when researching what was true at the end of the period.
 ```
 
-### Research (any research type)
-```markdown
-## For future Claude
-[Research type] on "[topic]" performed on [datetime]. [Specific scope: what was searched, how many sources, what model.] [Caveat about recency or confidence.] Use the recency markers per claim to know what to verify before relying on individual facts.
-```
-
 ### ADR
 ```markdown
 ## For future Claude
@@ -394,4 +365,4 @@ When auditing an existing note (Phase 2 work or one-off cleanup), verify:
 
 ## Migration Note
 
-This rule was established 2026-04-25 and shipped as part of obsidian-second-brain v0.5.0 (Research Toolkit). All 5 research commands (`/x-read`, `/x-pulse`, `/research`, `/research-deep`, `/youtube`) follow it from day one. The 26 existing `/obsidian-*` commands were updated in v0.6.0 (Phase 2) to explicitly reference this document. Notes written before that may not yet meet the standard - `/obsidian-health` flags them.
+This rule was established 2026-04-25 and shipped as part of obsidian-second-brain v0.5.0. The `/obsidian-*` commands were updated in v0.6.0 (Phase 2) to explicitly reference this document. Notes written before that may not yet meet the standard - `/obsidian-health` flags them.

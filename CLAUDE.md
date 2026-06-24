@@ -2,15 +2,15 @@
 
 Operating instructions for Claude Code when working inside this repo.
 
-This is the source repo for **obsidian-second-brain**, a Claude Code skill that turns any Obsidian vault into a living AI-first second brain. The skill ships 45 slash commands across 4 layers (vault management, thinking tools, research toolkit, scheduled agents).
+This is the source repo for **obsidian-second-brain**, a Claude Code skill that turns any Obsidian vault into a living AI-first second brain. The skill ships 38 slash commands across 3 layers (vault management, thinking tools, scheduled agents).
 
 If you are Claude operating on a user's vault, you want `_CLAUDE.md` inside their vault, not this file. This file is for working on the skill's source code.
 
 ## Repo layout
 
-- `commands/` - 45 slash command definitions, one `.md` per command. **This is the platform-neutral source.** Adapters compile it for each platform.
+- `commands/` - 38 slash command definitions, one `.md` per command. **This is the platform-neutral source.** Adapters compile it for each platform.
 - `references/` - shared specs that commands link to. **`ai-first-rules.md` is the canonical vault-write spec** and is non-negotiable.
-- `scripts/` - Python helpers (`bootstrap_vault.py`, `vault_health.py`, the `research/` toolkit), plus `build.sh` (the adapter orchestrator) and `lib.sh`.
+- `scripts/` - Python helpers (`bootstrap_vault.py`, `vault_health.py`, and other vault utilities), plus `build.sh` (the adapter orchestrator) and `lib.sh`.
 - `adapters/` - platform translation layer. `lib.sh` holds shared parsing helpers. `claude-code/`, `codex-cli/`, `gemini-cli/`, `opencode/` each ship an `adapter.sh`.
 - `dist/` - build output, one tree per platform. **Gitignored.** Regenerate with `bash scripts/build.sh` (all platforms) or `bash scripts/build.sh --platform <name>`.
 - `hooks/` - Claude Code hooks shipped with the skill.
@@ -49,7 +49,7 @@ If you are editing a command file in `commands/`, do not rewrite the AI-first pr
 ## Adding a new command
 
 1. Create `commands/<name>.md` with `description:` frontmatter and operating instructions.
-2. If it runs Python, add `scripts/research/<name>.py` (or appropriate subfolder).
+2. If it runs Python, add `scripts/<name>.py`.
 3. **Apply the AI-first rule to every vault write.** Reference `references/ai-first-rules.md` from the command body so future-Claude has the spec inline.
 4. If the command produces a new note type, add its frontmatter schema to `references/ai-first-rules.md`.
 5. Update `SKILL.md` (Layer section + command list) and `README.md` (commands table).

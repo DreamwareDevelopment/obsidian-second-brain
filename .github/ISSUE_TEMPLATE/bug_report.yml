@@ -42,11 +42,6 @@ body:
         - "/obsidian-connect"
         - "/obsidian-graduate"
         - "/obsidian-world"
-        - "/x-read"
-        - "/x-pulse"
-        - "/research"
-        - "/research-deep"
-        - "/youtube"
         - Background agent (PostCompact hook)
         - Scheduled agent (morning / nightly / weekly / health)
         - install.sh
@@ -60,8 +55,8 @@ body:
       label: What happened?
       description: What did you run, and what went wrong?
       placeholder: |
-        I ran `/research-deep "AI memory tools"`. The script said Phase 4 failed with:
-        "Perplexity API error 400: model not found"
+        I ran `/obsidian-daily`. The note was created but the overdue tasks
+        section was empty even though I have open tasks on the board.
     validations:
       required: true
 
@@ -69,7 +64,7 @@ body:
     id: expected
     attributes:
       label: What did you expect to happen?
-      placeholder: A research note saved to Research/Deep/ and Obsidian opening at the new note.
+      placeholder: The daily note should list my overdue tasks pulled from the kanban board.
     validations:
       required: true
 
@@ -80,8 +75,8 @@ body:
       description: Exact commands and inputs. The more specific, the faster the fix.
       placeholder: |
         1. Pull latest main (commit hash)
-        2. Run `uv sync`
-        3. Run `/research-deep "topic name"`
+        2. Restart Claude Code
+        3. Run `/obsidian-daily`
         4. See error
     validations:
       required: true
@@ -110,7 +105,7 @@ body:
     id: logs
     attributes:
       label: Relevant logs / error output
-      description: Paste error messages, stack traces, or `~/.research-toolkit/usage.log` entries if relevant.
+      description: Paste error messages, stack traces, or hook log entries (e.g. /tmp/obsidian-bg-agent.log) if relevant.
       render: shell
 
   - type: checkboxes

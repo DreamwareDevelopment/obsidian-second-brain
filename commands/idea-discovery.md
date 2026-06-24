@@ -14,7 +14,7 @@ Answers "what is worth doing next" from material already in the vault. Distinct 
    - Orphan research notes in `Research/` that no project links to.
 2. Rank the candidates by a simple, stated heuristic: recency (touched recently), pull (how many notes reference or depend on it), and momentum (does anything already build toward it). State the heuristic in the output so the ranking is auditable.
 3. For each of the top 3-5, write: the candidate, why now, the `[[source notes]]`, and the smallest next step that would move it forward.
-4. Optionally suggest running `/research [topic]` on a candidate to pull external signal before committing, or `/obsidian-graduate` to promote one into a full project.
+4. Optionally suggest pulling external signal on a candidate (via an MCP web-search connector) before committing, or `/obsidian-graduate` to promote one into a full project.
 5. Save the shortlist to `Ideas/YYYY-MM-DD - discovery.md` (`type: synthesis`, tagged `[thinking, idea-discovery]`) with source links in frontmatter. Do NOT auto-graduate anything - this command only surfaces and ranks.
 
 ---

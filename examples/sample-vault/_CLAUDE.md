@@ -33,7 +33,7 @@ If a note Claude is about to write would not pass this rule, fix the note before
 - `Ideas/` - fragment captures, dated filenames
 - `Decisions/` - standalone decision records (most decisions live inside project notes)
 - `Knowledge/` - synthesis, ADRs, learning notes
-- `Research/` - outputs from `/research`, `/research-deep`, `/x-read`, `/x-pulse`, `/youtube`
+- `Research/` - research notes and saved external sources
 - `wiki/logs/` - dev logs and session logs
 - `social-media/` - content pipeline (ideas, swipe file, data points)
 - `Boards/` - kanban boards for tasks per project

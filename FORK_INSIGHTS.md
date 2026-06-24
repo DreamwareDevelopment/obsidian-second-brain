@@ -6,7 +6,9 @@ This is a roadmap doc, not a spec. It captures what every diverging fork built, 
 
 ## Build status (2026-05-31) - project complete
 
-Shipped ~32 of the 50 across PRs #45-55, in releases v0.9.0 and v0.10.0 ("The Architect"). Every P0 landed. Highlights: first tests + CI, anti-fabrication/false-absence guards, free key-less research mode, Google Calendar commands, `/obsidian-recurring`, calendar reconciliation, `/vault-deep-synthesis`, `/idea-discovery`, `/obsidian-panel`, the Codex executable runner, the commit-decisions miner, the substitution-character CI gate, sentinel-safe regeneration, and `/obsidian-architect` (codebase -> vault docs). Command count: 43.
+Shipped ~32 of the 50 across PRs #45-55, in releases v0.9.0 and v0.10.0 ("The Architect"). Every P0 landed. Highlights: first tests + CI, anti-fabrication/false-absence guards, Google Calendar commands, `/obsidian-recurring`, calendar reconciliation, `/vault-deep-synthesis`, `/idea-discovery`, `/obsidian-panel`, the Codex executable runner, the commit-decisions miner, the substitution-character CI gate, sentinel-safe regeneration, and `/obsidian-architect` (codebase -> vault docs). Command count: 43.
+
+> Note (later): the research toolkit shipped here was removed in a subsequent release. The analysis below is preserved as a point-in-time record of what the forks built; research is now handled via MCP connectors instead. See `CHANGELOG.md`.
 
 **Won't do (intentional, not backlog).** The remaining items were evaluated and consciously declined - keeping the skill lean beats covering every fork idea:
 
