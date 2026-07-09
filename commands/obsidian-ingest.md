@@ -1,5 +1,5 @@
 ---
-description: Ingest a source into the vault - the vault rewrites itself around new knowledge. Every ingest updates entities, rewrites stale claims, synthesizes new concepts, and resolves contradictions.
+description: Ingest a source into the vault - updates entities, rewrites stale claims, resolves contradictions.
 category: research
 triggers_en: ["ingest this source", "add this article", "import this", "absorb this"]
 ---
