@@ -23,18 +23,24 @@ The argument is a URL, file path, or pasted text. If no argument, ask what to in
 
    **For YouTube URLs** - try methods in this order (use the first one that works):
 
-   **Method A - `yt-dlp` (best, works in Claude Code / terminal):**
+   **Method A - the `youtube` MCP (the decided path, ADR-033/039/181):**
+   Use `get_transcript(url)` / `list_languages(url)`. Detect it by tool name **suffix** (`...get_transcript`), NOT by a `mcp__youtube__` prefix - some clients surface connectors under opaque server ids, so a prefix check reports "unavailable" for a server that is attached and working.
+   On `{"available": false}`, branch on `code`, never on the prose `reason`:
+   - `blocked` / `fetch_error` (`retryable: true`) - the hosted server's egress IP was refused. **This says nothing about the video.** Fall through to Method B, which exits from this machine's IP.
+   - `transcripts_disabled` / `video_unavailable` / `no_transcript` / `age_restricted` - a real property of the video. Stop; the other methods won't produce captions either.
+
+   **Method B - `yt-dlp` (this machine's IP; the fallback when the hosted server is blocked):**
    ```bash
-   which yt-dlp || brew install yt-dlp
+   which yt-dlp || echo "install first: pipx install yt-dlp (or brew install yt-dlp)"
    yt-dlp --skip-download --print title --print description --print duration_string --print view_count --print like_count --print upload_date --print channel "URL"
    yt-dlp --write-auto-sub --sub-lang en --skip-download -o "/tmp/%(id)s" "URL"
    ```
-
-   **Method B - YouTube MCP tools (works in Claude Desktop if configured):**
-   Check if YouTube MCP tools are available. If so, use them.
+   Works from a residential connection; expect the same block as Method A in a cloud/datacenter session.
 
    **Method C - oEmbed fallback (works everywhere, limited data):**
    Fetch `https://www.youtube.com/oembed?url=URL&format=json` - gives title and channel only. Ask user to paste description for full ingest.
+
+   **If every method is blocked** (which is not "no captions"): say the *fetch* was blocked, never that the video lacks a transcript, and park it as retryable for a re-drop. Never record a transient fetch failure as a permanent property of the source.
 
    **For audio files** (.m4a, .mp3, .wav, .ogg, .webm):
    ```bash
