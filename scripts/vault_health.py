@@ -27,10 +27,14 @@ from pathlib import Path
 
 TODAY = date.today()
 EXCLUDE_DIRS = {".obsidian", ".trash", "_trash", ".git", "Templates",
-                # gitignored harness dirs. .claude/worktrees holds full vault
-                # copies; scanning them multiplies every finding by the
-                # worktree count and swamps the report with phantom duplicates.
-                ".claude", ".superpowers"}
+                ".superpowers"}
+# Path PREFIXES to skip, for dirs that hold full vault copies: scanning them
+# multiplies every finding by the worktree count and swamps the report with
+# phantom duplicates. A prefix, not an EXCLUDE_DIRS entry, because `.claude`
+# itself carries tracked, linkable content (the versioned harness commands) —
+# excluding the whole directory drops those from every check AND reports live
+# links to them as broken.
+EXCLUDE_PATH_PREFIXES = (".claude/worktrees",)
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 # Fenced + inline code carry syntax examples like `[[wikilinks]]`. They are
 # documentation, not references, so they are stripped before link extraction.
@@ -71,8 +75,11 @@ def parse_aliases(frontmatter: str) -> list:
 def load_vault(vault: Path) -> dict:
     notes = {}
     for md in vault.rglob("*.md"):
-        parts = md.relative_to(vault).parts
+        rel_path = md.relative_to(vault)
+        parts = rel_path.parts
         if any(p in EXCLUDE_DIRS for p in parts):
+            continue
+        if str(rel_path).startswith(EXCLUDE_PATH_PREFIXES):
             continue
         rel = str(md.relative_to(vault))
         content = md.read_text(encoding="utf-8", errors="replace")
