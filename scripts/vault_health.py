@@ -148,6 +148,8 @@ def check_orphans(notes: dict) -> list:
         top_folder = rel.split("/")[0] if "/" in rel else ""
         if top_folder in skip_folders:
             continue
+        if rel.startswith(ORPHAN_EXEMPT_PREFIXES):
+            continue
         if rel in ("Home.md", "_CLAUDE.md"):
             continue
         stem_lower = note["stem"].lower()
@@ -190,11 +192,25 @@ def check_stale_tasks(notes: dict) -> list:
     return issues
 
 
+# Folders that hold files which are not vault notes, and so are not expected to
+# carry note frontmatter or to be linked from the knowledge graph:
+#   docs/   engineering specs and plans. Absent from _CLAUDE.md's folder map,
+#           and only 10 of 116 carry frontmatter - the convention is NOT to.
+#   _meta/  telemetry ledgers, logs, indexes and harness config.
+#   Inbox/  staging. Unprocessed drops are unlinked BY DESIGN until drained,
+#           so orphan-ness there is the normal state, not a defect.
+#   Archive/ frozen historical records; re-linking them is not a goal.
+NON_NOTE_PREFIXES = ("docs/", "_meta/", "Archive/")
+ORPHAN_EXEMPT_PREFIXES = NON_NOTE_PREFIXES + ("Inbox/",)
+
+
 def check_missing_frontmatter(notes: dict) -> list:
     issues = []
     skip = {"Templates", "_trash", ".obsidian"}
     for rel, note in notes.items():
         if any(s in rel for s in skip):
+            continue
+        if rel.startswith(NON_NOTE_PREFIXES):
             continue
         if rel in ("Home.md", "_CLAUDE.md"):
             continue
