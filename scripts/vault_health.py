@@ -26,27 +26,46 @@ from datetime import date
 from pathlib import Path
 
 TODAY = date.today()
-EXCLUDE_DIRS = {".obsidian", ".trash", "_trash", ".git", "Templates"}
+EXCLUDE_DIRS = {".obsidian", ".trash", "_trash", ".git", "Templates",
+                # gitignored harness dirs. .claude/worktrees holds full vault
+                # copies; scanning them multiplies every finding by the
+                # worktree count and swamps the report with phantom duplicates.
+                ".claude", ".superpowers"}
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
+# Fenced + inline code carry syntax examples like `[[wikilinks]]`. They are
+# documentation, not references, so they are stripped before link extraction.
+CODE_FENCE_RE = re.compile(r"```.*?```", re.DOTALL)
+INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 # A note whose entire body was accidentally saved inside a ```markdown code fence:
 # the first non-blank line opens a fence and the real frontmatter (---) lives INSIDE it.
 # This must be detected separately from genuinely-missing frontmatter, because the naive
 # "add frontmatter" fix prepends a SECOND frontmatter block and leaves the body trapped
 # in the fence (double corruption). The correct fix is to UNWRAP, not to add.
 CODE_FENCE_WRAP_RE = re.compile(r"\A\s*```[^\n]*\n\s*---\s*\n")
-LINK_RE = re.compile(r"\[\[([^\]|#]+)(?:[|#][^\]]*)?\]\]")
+# Capture the entire target. Splitting on "#" here is wrong: many note filenames
+# legitimately contain "#" ("Ops scan #1 ..."), and truncating there reports every
+# link to them as broken. The display alias after "|" is dropped; "#" is resolved
+# as a heading ref only if the full target does not match a real note.
+LINK_RE = re.compile(r"\[\[([^\]\[]+)\]\]")
 DATE_RE = re.compile(r"due:\s*(\d{4}-\d{2}-\d{2})")
 TEMPLATE_RE = re.compile(r"<%.*?%>")
 ALIAS_RE = re.compile(r"^aliases:\s*\n((?:\s+-\s+.+\n?)+)", re.MULTILINE)
+# Inline form: `aliases: [ADR-091, foo]`. The block-style ALIAS_RE cannot see this,
+# and it is the form nearly every ADR uses - without it every [[ADR-NNN]] shorthand
+# link is reported broken.
+ALIAS_INLINE_RE = re.compile(r"^aliases:\s*\[([^\]]*)\]\s*$", re.MULTILINE)
 ALIAS_ITEM_RE = re.compile(r"^\s+-\s+(.+)$", re.MULTILINE)
 
 
 def parse_aliases(frontmatter: str) -> list:
     """Extract aliases list from frontmatter text."""
     block = ALIAS_RE.search(frontmatter)
-    if not block:
-        return []
-    return [m.strip().strip('"\'').lower() for m in ALIAS_ITEM_RE.findall(block.group(1))]
+    if block:
+        return [m.strip().strip('"\'').lower() for m in ALIAS_ITEM_RE.findall(block.group(1))]
+    inline = ALIAS_INLINE_RE.search(frontmatter)
+    if inline:
+        return [a.strip().strip('"\'').lower() for a in inline.group(1).split(",") if a.strip()]
+    return []
 
 
 def load_vault(vault: Path) -> dict:
@@ -59,7 +78,12 @@ def load_vault(vault: Path) -> dict:
         content = md.read_text(encoding="utf-8", errors="replace")
         fm_match = FRONTMATTER_RE.match(content)
         frontmatter = fm_match.group(1) if fm_match else ""
-        links = [l.strip().rstrip("\\") for l in LINK_RE.findall(content)]
+        link_src = INLINE_CODE_RE.sub("", CODE_FENCE_RE.sub("", content))
+        links = [
+            l.split("|")[0].strip().rstrip("\\")
+            for l in LINK_RE.findall(link_src)
+        ]
+        links = [l for l in links if l]
         due_match = DATE_RE.search(frontmatter)
         notes[rel] = {
             "path": md,
@@ -234,8 +258,38 @@ def _normalize_dashes(s: str) -> str:
     return s.replace(_EM_DASH, "-").replace(_EN_DASH, "-")
 
 
+def _resolves(link, all_stems, all_stems_dash_norm, all_aliases, all_paths) -> bool:
+    """True if a wikilink target names a real note.
+
+    Tries the target as a vault-relative path first, then as a bare name. Uses
+    rsplit("/") rather than Path().stem because a filename may contain dots
+    ("ADR-020 - blackvest.ai: ...") that Path would mistake for an extension.
+    """
+    raw = link.strip().rstrip("\\")
+    if not raw:
+        return True
+    low = raw.lower()
+    if low.endswith(".md"):
+        low = low[:-3]
+    if low in all_paths or _normalize_dashes(low) in all_paths:
+        return True
+    stem = low.rsplit("/", 1)[-1]
+    norm = stem.replace("-", " ").replace("_", " ")
+    return (
+        stem in all_stems
+        or norm in all_stems
+        or stem in all_aliases
+        or norm in all_aliases
+        or _normalize_dashes(stem) in all_stems_dash_norm
+    )
+
+
 def check_broken_links(notes: dict, vault: Path) -> list:
     all_stems = {note["stem"].lower(): rel for rel, note in notes.items()}
+    # Links are commonly written as a vault-relative path ([[Resources/ADRs/ADR-020 - x]]).
+    # Without a path index every one of those resolves to nothing and is reported broken.
+    all_paths = {rel[:-3].lower(): rel for rel in notes if rel.endswith(".md")}
+    all_paths.update({_normalize_dashes(k): v for k, v in list(all_paths.items())})
     # also index stems with em-dashes normalized to regular hyphens so a
     # wikilink written with `-` still matches a filename written with `-`
     all_stems_dash_norm = {
@@ -257,16 +311,17 @@ def check_broken_links(notes: dict, vault: Path) -> list:
         if Path(rel).name in SKIP_FROM_LINK_SCAN:
             continue
         for link in note["links"]:
-            link_stem = Path(link).stem.lower() if "/" in link else link.lower()
-            link_norm = link_stem.replace("-", " ").replace("_", " ")
-            link_dash_norm = _normalize_dashes(link_stem)
-            resolved = (
-                link_stem in all_stems
-                or link_norm in all_stems
-                or link_stem in all_aliases
-                or link_norm in all_aliases
-                or link_dash_norm in all_stems_dash_norm
-            )
+            resolved = _resolves(link, all_stems, all_stems_dash_norm,
+                                 all_aliases, all_paths)
+            if not resolved and "#" in link:
+                # Only now treat "#" as a heading ref - the full form was tried first.
+                base = link.split("#")[0].strip()
+                resolved = not base or _resolves(base, all_stems, all_stems_dash_norm,
+                                                 all_aliases, all_paths)
+            if not resolved and "^" in link:
+                base = link.split("^")[0].strip()
+                resolved = not base or _resolves(base, all_stems, all_stems_dash_norm,
+                                                 all_aliases, all_paths)
             if not resolved:
                 potential_folder = vault / link
                 if not potential_folder.is_dir():
