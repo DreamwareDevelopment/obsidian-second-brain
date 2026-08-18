@@ -306,9 +306,18 @@ def check_broken_links(notes: dict, vault: Path) -> list:
     # broken-link scan so they don't generate dozens of false positives per scan.
     SKIP_FROM_LINK_SCAN = {"_CLAUDE.md"}
 
+    # Generated health reports QUOTE the broken links they find ("Broken link
+    # [[X]] in Y"). Scanning them re-reports every previously-reported break as a
+    # fresh one, so each report seeds the next report's noise and the count only
+    # ever grows. Their [[...]] are quotations, not navigation - skip the folders
+    # the reports are written to.
+    SKIP_LINK_SCAN_PREFIXES = ("Archive/health-reports/", "Reviews/Health/")
+
     issues = []
     for rel, note in notes.items():
         if Path(rel).name in SKIP_FROM_LINK_SCAN:
+            continue
+        if rel.startswith(SKIP_LINK_SCAN_PREFIXES):
             continue
         for link in note["links"]:
             resolved = _resolves(link, all_stems, all_stems_dash_norm,
