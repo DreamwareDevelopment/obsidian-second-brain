@@ -166,7 +166,21 @@ Same as commits - imperative + WHY-focused. Examples that ship fast:
 ```bash
 # Run the smoke tests (adapter build pipeline + vault tooling, pure stdlib)
 uv run pytest
+
+# Only the tests whose covered code changed
+uv run pytest --testmon
 ```
+
+The first `--testmon` run is a full run that builds `.testmondata` (gitignored,
+along with its `-shm` / `-wal` sidecars); after that it selects a subset. A
+change to a shared module correctly widens the next selection, so a full run is
+testmon working, not testmon failing. Do not combine `--testmon` with `-n`: the
+selection happens at collection and every xdist worker would write the data
+file.
+
+`pytest-xdist` is installed for consistency across the repos, but this suite is
+9 tests in about 1.3s and `-n auto` measures ~1.8s, so nothing here uses it and
+CI is unchanged. See SEC-954.
 
 **For slash command changes:**
 1. Symlink your local checkout into `~/.claude/commands/`

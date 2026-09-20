@@ -30,3 +30,7 @@ package.json
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# Test selection data (pytest-testmon); also its -shm / -wal sidecars
+.testmondata
+.testmondata-*
